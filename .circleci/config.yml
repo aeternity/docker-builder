@@ -6,7 +6,7 @@ references:
       - image: golang:1.8.0
     working_directory: ~/builder
     environment:
-      DOCKERHUB_REPO: aetrnty/builder
+      DOCKERHUB_REPO: aeternity/builder
       DOCKER_CLIENT_VERSION: "17.09.0-ce"
 
   setup_remote_docker: &setup_remote_docker
