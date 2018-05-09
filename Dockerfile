@@ -3,6 +3,7 @@ FROM ubuntu:16.04
 RUN apt-get -qq update \
     && apt-get -qq -y install git curl \
         autoconf build-essential ncurses-dev libssl-dev \
+        libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev libzstd-dev \
         python-pip python-dev python3-pip python3-dev software-properties-common \
         default-jre-headless \
     && apt-add-repository ppa:ansible/ansible \
@@ -26,6 +27,14 @@ RUN LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/downl
     && tar -zxf libsodium-src.tar.gz -C libsodium-src --strip-components=1 \
     && cd libsodium-src \
     && ./configure && make -j$(nproc) && make install && ldconfig
+
+ENV ROCKSDB_VERSION=5.12.4
+RUN ROCKSDB_DOWNLOAD_URL="https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz" \
+    && curl -fsSL -o rocksdb-src.tar.gz "$ROCKSDB_DOWNLOAD_URL" \
+    && mkdir rocksdb-src \
+    && tar -zxf rocksdb-src.tar.gz -C rocksdb-src --strip-components=1 \
+    && cd rocksdb-src \
+    && make -j$(nproc) shared_lib && make install-shared && ldconfig
 
 RUN pip install virtualenv
 
