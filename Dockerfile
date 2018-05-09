@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 RUN apt-get -qq update \
     && apt-get -qq -y install git curl \
         autoconf build-essential ncurses-dev libssl-dev \
-        libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev libzstd-dev \
+        libsnappy-dev liblz4-dev libbz2-dev \
         python-pip python-dev python3-pip python3-dev software-properties-common \
         default-jre-headless \
     && apt-add-repository ppa:ansible/ansible \
@@ -34,7 +34,7 @@ RUN ROCKSDB_DOWNLOAD_URL="https://github.com/facebook/rocksdb/archive/v${ROCKSDB
     && mkdir rocksdb-src \
     && tar -zxf rocksdb-src.tar.gz -C rocksdb-src --strip-components=1 \
     && cd rocksdb-src \
-    && make -j$(nproc) shared_lib && make install-shared && ldconfig
+    && make -j$(nproc) static_lib && make install-static && ldconfig
 
 RUN pip install virtualenv
 
