@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 RUN apt-get -qq update \
-    && apt-get -qq -y install git curl \
+    && apt-get -qq -y install git curl unzip \
         autoconf build-essential ncurses-dev libssl-dev \
         python-pip python-dev python3-pip python3-dev software-properties-common \
         default-jre-headless \
@@ -28,6 +28,11 @@ RUN LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/downl
     && ./configure && make -j$(nproc) && make install && ldconfig
 
 RUN pip install virtualenv
+
+ENV PACKER_VERSION=1.2.4
+ADD https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip ./
+RUN unzip packer_${PACKER_VERSION}_linux_amd64.zip -d /bin
+RUN rm -f packer_${PACKER_VERSION}_linux_amd64.zip
 
 # Add non-root user in case some app won't run as root
 RUN useradd --shell /bin/bash builder --create-home
