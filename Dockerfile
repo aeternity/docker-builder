@@ -34,6 +34,12 @@ ADD https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERS
 RUN unzip packer_${PACKER_VERSION}_linux_amd64.zip -d /bin
 RUN rm -f packer_${PACKER_VERSION}_linux_amd64.zip
 
+ENV TERRAFORM_VERSION 0.11.7
+RUN https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+    && unzip packer_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin \
+    && rm -f packer_${TERRAFORM_VERSION}_linux_amd64.zip
+
+
 # Add non-root user in case some app won't run as root
 RUN useradd --shell /bin/bash builder --create-home
 
