@@ -36,8 +36,8 @@ RUN rm -f packer_${PACKER_VERSION}_linux_amd64.zip
 
 ENV TERRAFORM_VERSION 0.11.7
 ADD https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip ./
-RUN unzip packer_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin \
-    && rm -f packer_${TERRAFORM_VERSION}_linux_amd64.zip
+RUN unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin \
+    && rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
 
 # Add non-root user in case some app won't run as root
