@@ -35,8 +35,8 @@ RUN unzip packer_${PACKER_VERSION}_linux_amd64.zip -d /bin
 RUN rm -f packer_${PACKER_VERSION}_linux_amd64.zip
 
 ENV TERRAFORM_VERSION 0.11.7
-RUN https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
-    && unzip packer_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin \
+ADD https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip ./
+RUN unzip packer_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin \
     && rm -f packer_${TERRAFORM_VERSION}_linux_amd64.zip
 
 
