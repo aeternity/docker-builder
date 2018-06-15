@@ -39,7 +39,6 @@ ADD https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TE
 RUN unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin \
     && rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
-
 # Add non-root user in case some app won't run as root
 RUN useradd --shell /bin/bash builder --create-home
 
