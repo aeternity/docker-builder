@@ -10,7 +10,7 @@ RUN apt-get -qq update \
     && apt-get -qq -y install ansible \
     && rm -rf /var/lib/apt/lists/*
 
-ENV OTP_VERSION="20.2.3"
+ENV OTP_VERSION="20.3.8"
 RUN OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" \
     && curl -fsSL -o otp-src.tar.gz "$OTP_DOWNLOAD_URL" \
     && mkdir otp-src \
