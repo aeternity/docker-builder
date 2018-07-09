@@ -27,7 +27,7 @@ RUN LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/downl
     && cd libsodium-src \
     && ./configure && make -j$(nproc) && make install && ldconfig
 
-RUN pip install virtualenv
+RUN pip install virtualenv awscli
 
 ENV PACKER_VERSION=1.2.4
 ADD https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip ./
