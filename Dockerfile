@@ -3,11 +3,8 @@ FROM ubuntu:16.04
 RUN apt-get -qq update \
     && apt-get -qq -y install git curl unzip \
         autoconf build-essential ncurses-dev libssl-dev \
-        python-pip python-dev python3-pip python3-dev software-properties-common \
+        python-pip python-dev \
         default-jre-headless \
-    && apt-add-repository ppa:ansible/ansible \
-    && apt-get -qq update \
-    && apt-get -qq -y install ansible \
     && rm -rf /var/lib/apt/lists/*
 
 ENV OTP_VERSION="20.3.8"
@@ -28,16 +25,6 @@ RUN LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/downl
     && ./configure && make -j$(nproc) && make install && ldconfig
 
 RUN pip install virtualenv awscli
-
-ENV PACKER_VERSION=1.2.4
-ADD https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip ./
-RUN unzip packer_${PACKER_VERSION}_linux_amd64.zip -d /bin
-RUN rm -f packer_${PACKER_VERSION}_linux_amd64.zip
-
-ENV TERRAFORM_VERSION 0.11.7
-ADD https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip ./
-RUN unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /bin \
-    && rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
 # Add non-root user in case some app won't run as root
 RUN useradd --shell /bin/bash builder --create-home
