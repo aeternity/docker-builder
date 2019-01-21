@@ -7,7 +7,7 @@ RUN apt-get -qq update \
         default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 
-ENV OTP_VERSION="20.3.8"
+ENV OTP_VERSION="21.2.3"
 RUN OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" \
     && curl -fsSL -o otp-src.tar.gz "$OTP_DOWNLOAD_URL" \
     && mkdir otp-src \
