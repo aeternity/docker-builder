@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Configure docker image tag
           command: |
-            echo "export TAG=ci-build-u18-$CIRCLE_BRANCH" >> $BASH_ENV
+            echo "export TAG=1804_deb_pkgs" >> $BASH_ENV
             echo "export DOCKERFILE_PATH=package_ubuntu_18.04" >> $BASH_ENV
       - *build_and_push
 
@@ -83,7 +83,7 @@ workflows:
           requires: []
           filters:
             branches:
-              ignore: master
+              only: master
 
       - deploy:
           filters:
