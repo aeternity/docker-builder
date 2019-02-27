@@ -8,6 +8,7 @@ references:
     environment:
       DOCKERHUB_REPO: aeternity/builder
       DOCKER_CLIENT_VERSION: "17.09.0-ce"
+      DOCKERFILE_PATH: "."
 
   setup_remote_docker: &setup_remote_docker
     setup_remote_docker:
@@ -27,7 +28,7 @@ references:
     run:
       name: Build and push Docker image
       command: |
-        docker build -t $DOCKERHUB_REPO:$TAG .
+        docker build -t $DOCKERHUB_REPO:$TAG $DOCKERFILE_PATH
         docker login -u $DOCKER_USER -p $DOCKER_PASS
         docker push $DOCKERHUB_REPO:$TAG
 
@@ -53,7 +54,7 @@ jobs:
           name: Configure docker image tag
           command: |
             echo "export TAG=ci-build-u18-$CIRCLE_BRANCH" >> $BASH_ENV
-            cd package_ubuntu_18.04
+            echo "export DOCKERFILE_PATH=package_ubuntu_18.04" >> $BASH_ENV
       - *build_and_push
 
   deploy:
