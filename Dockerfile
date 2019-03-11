@@ -7,7 +7,8 @@ RUN apt-get -qq update \
         default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 
-ENV OTP_VERSION="20.3.8"
+ARG BUILD_OTP_VERSION="20.3.8"
+ENV OTP_VERSION=$BUILD_OTP_VERSION
 RUN OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" \
     && curl -fsSL -o otp-src.tar.gz "$OTP_DOWNLOAD_URL" \
     && mkdir otp-src \
@@ -24,10 +25,10 @@ RUN LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/downl
     && cd libsodium-src \
     && ./configure && make -j$(nproc) && make install && ldconfig
 
-ENV REBAR3_VERSION="3.5.0"
+ENV REBAR3_VERSION="3.9.0"
 RUN set -xe \
     && REBAR3_DOWNLOAD_URL="https://github.com/erlang/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
-    && REBAR3_DOWNLOAD_SHA256="e95e9d1f2ce219f548d4f49ad41409af02069190f19e2b6717585eef6ee77501" \
+    && REBAR3_DOWNLOAD_SHA256="9ea73ce4e60ad4b3108641eae73b4098fadb510142e672ad8e3a793f57e9f992" \
     && mkdir -p /usr/src/rebar3-src \
     && curl -fSL -o rebar3-src.tar.gz "$REBAR3_DOWNLOAD_URL" \
     && echo "$REBAR3_DOWNLOAD_SHA256 rebar3-src.tar.gz" | sha256sum -c - \
