@@ -10,10 +10,10 @@ RUN apt-get -qq update \
 	debhelper dh-autoreconf \
     && rm -rf /var/lib/apt/lists/*
 
-ENV REBAR3_VERSION="3.9.1"
+ENV REBAR3_VERSION="3.9.1-aeternity.1"
 RUN set -xe \
-    && REBAR3_DOWNLOAD_URL="https://github.com/erlang/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
-    && REBAR3_DOWNLOAD_SHA256="b7330a67a8cb5d6fb3b53a3246208b7c2b248546bcf62ef71a9a27b1d541c2d8" \
+    && REBAR3_DOWNLOAD_URL="https://github.com/aeternity/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
+    && REBAR3_DOWNLOAD_SHA256="09e66f741d46f1cc4d33cc5d31e616b5be06aac025938d1a4f82802c3b7341ea" \
     && mkdir -p /usr/src/rebar3-src \
     && curl -fSL -o rebar3-src.tar.gz "$REBAR3_DOWNLOAD_URL" \
     && echo "$REBAR3_DOWNLOAD_SHA256 rebar3-src.tar.gz" | sha256sum -c - \
