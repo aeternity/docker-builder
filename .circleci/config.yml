@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 references:
   container_config: &container_config
@@ -89,24 +89,28 @@ workflows:
   build_deploy:
     jobs:
       - build:
+          context: ae-dockerhub
           requires: []
           filters:
             branches:
               ignore: master
 
       - build_1804:
+          context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
       - build_1604_otp21:
+          context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
       - deploy:
+          context: ae-dockerhub
           filters:
             branches:
               only: master
