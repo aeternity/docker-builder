@@ -8,6 +8,7 @@ RUN apt-get -qq update \
 	libsodium-dev debhelper apt-transport-https \
 	autoconf build-essential devscripts erlang \
 	debhelper dh-autoreconf \
+        ruby-licensee \
     && rm -rf /var/lib/apt/lists/*
 
 ENV REBAR3_VERSION="3.11.1-aeternity.1"
