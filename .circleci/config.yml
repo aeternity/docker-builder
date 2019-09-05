@@ -29,7 +29,7 @@ references:
       name: Build and push Docker image
       command: |
         docker build -t $DOCKERHUB_REPO:$TAG \
-          --build-arg BUILD_OTP_VERSION=${BUILD_OTP_VERSION:-20.3.8} $DOCKERFILE_PATH
+          --build-arg BUILD_OTP_VERSION=${BUILD_OTP_VERSION:-20.3.8.9} $DOCKERFILE_PATH
         docker login -u $DOCKER_USER -p $DOCKER_PASS
         docker push $DOCKERHUB_REPO:$TAG
 
@@ -56,7 +56,7 @@ jobs:
           name: Configure docker image tag
           command: |
             echo "export TAG=otp21" >> $BASH_ENV
-            echo "export BUILD_OTP_VERSION=21.2.3" >> $BASH_ENV
+            echo "export BUILD_OTP_VERSION=21.3.8.6" >> $BASH_ENV
       - *build_and_push
 
   build_1804:
