@@ -34,7 +34,7 @@ RUN LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/downl
 
 ENV REBAR3_VERSION="3.12.0"
 RUN set -xe \
-    && REBAR3_DOWNLOAD_URL="https://github.com/aeternity/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
+    && REBAR3_DOWNLOAD_URL="https://github.com/erlang/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
     && REBAR3_DOWNLOAD_SHA256="d39bda02dd30276b2803fdb64ff731723961007608aa38e7422e603def70dc55" \
     && mkdir -p /usr/src/rebar3-src \
     && curl -fSL -o rebar3-src.tar.gz "$REBAR3_DOWNLOAD_URL" \
