@@ -20,7 +20,7 @@ RUN apt-get -qq update \
         unzip \
     && rm -rf /var/lib/apt/lists/*
 
-ENV REBAR3_VERSION="3.12"
+ENV REBAR3_VERSION="3.12.0"
 RUN set -xe \
     && REBAR3_DOWNLOAD_URL="https://github.com/erlang/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
     && REBAR3_DOWNLOAD_SHA256="d39bda02dd30276b2803fdb64ff731723961007608aa38e7422e603def70dc55" \
