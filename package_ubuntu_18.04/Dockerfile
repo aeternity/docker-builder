@@ -1,19 +1,29 @@
 FROM ubuntu:18.04
 
 RUN apt-get -qq update \
-    && apt-get -qq -y install git curl unzip \
-        autoconf build-essential ncurses-dev libssl-dev \
-        python-pip python-dev \
+    && apt-get -qq -y install \
+        apt-transport-https \
+        autoconf \
+        build-essential \
+        curl \
+        debhelper \
         default-jre-headless \
-	libsodium-dev debhelper apt-transport-https \
-	autoconf build-essential devscripts erlang \
-	debhelper dh-autoreconf \
+        devscripts \
+        erlang \
+        dh-autoreconf \
+        git \
+        libsodium-dev \
+        libssl-dev \
+        ncurses-dev \
+        python-dev \
+        python-pip \
+        unzip \
     && rm -rf /var/lib/apt/lists/*
 
-ENV REBAR3_VERSION="3.11.1-aeternity.1"
+ENV REBAR3_VERSION="3.12"
 RUN set -xe \
-    && REBAR3_DOWNLOAD_URL="https://github.com/aeternity/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
-    && REBAR3_DOWNLOAD_SHA256="d03515e1a0f6a6722e8555155fcc9f9f29a41669b6c00658192c838f5099fd55" \
+    && REBAR3_DOWNLOAD_URL="https://github.com/erlang/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
+    && REBAR3_DOWNLOAD_SHA256="d39bda02dd30276b2803fdb64ff731723961007608aa38e7422e603def70dc55" \
     && mkdir -p /usr/src/rebar3-src \
     && curl -fSL -o rebar3-src.tar.gz "$REBAR3_DOWNLOAD_URL" \
     && echo "$REBAR3_DOWNLOAD_SHA256 rebar3-src.tar.gz" | sha256sum -c - \
