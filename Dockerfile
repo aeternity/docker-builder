@@ -14,7 +14,7 @@ RUN apt-get -qq update \
         unzip \
     && rm -rf /var/lib/apt/lists/*
 
-ARG BUILD_OTP_VERSION="20.3.8.23"
+ARG BUILD_OTP_VERSION="20.3.8.24"
 ENV OTP_VERSION=$BUILD_OTP_VERSION
 RUN OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" \
     && curl -fsSL -o otp-src.tar.gz "$OTP_DOWNLOAD_URL" \
