@@ -69,7 +69,7 @@ jobs:
           name: Configure docker image tag
           command: |
             echo "export TAG=otp22" >> $BASH_ENV
-            echo "export BUILD_OTP_VERSION=22.1.7" >> $BASH_ENV
+            echo "export BUILD_OTP_VERSION=22.1.8" >> $BASH_ENV
       - *build_and_push
 
   build_1804:
