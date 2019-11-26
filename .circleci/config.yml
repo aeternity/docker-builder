@@ -29,7 +29,7 @@ references:
       name: Build and push Docker image
       command: |
         docker build -t $DOCKERHUB_REPO:$TAG \
-          --build-arg BUILD_OTP_VERSION=${BUILD_OTP_VERSION:-20.3.8.23} $DOCKERFILE_PATH
+          --build-arg BUILD_OTP_VERSION=${BUILD_OTP_VERSION:-20.3.8.24} $DOCKERFILE_PATH
         docker login -u $DOCKER_USER -p $DOCKER_PASS
         docker push $DOCKERHUB_REPO:$TAG
 
@@ -56,7 +56,20 @@ jobs:
           name: Configure docker image tag
           command: |
             echo "export TAG=otp21" >> $BASH_ENV
-            echo "export BUILD_OTP_VERSION=21.3.8.9" >> $BASH_ENV
+            echo "export BUILD_OTP_VERSION=21.3.8.11" >> $BASH_ENV
+      - *build_and_push
+
+  build_1604_otp22:
+    <<: *container_config
+    steps:
+      - checkout
+      - *setup_remote_docker
+      - *install_docker_client
+      - run:
+          name: Configure docker image tag
+          command: |
+            echo "export TAG=otp22" >> $BASH_ENV
+            echo "export BUILD_OTP_VERSION=22.1.8" >> $BASH_ENV
       - *build_and_push
 
   build_1804:
@@ -103,6 +116,13 @@ workflows:
               only: master
 
       - build_1604_otp21:
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_1604_otp22:
           context: ae-dockerhub
           requires: []
           filters:
