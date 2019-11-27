@@ -7,6 +7,7 @@ RUN apt-get -qq update \
         curl \
         default-jre-headless \
         git \
+        libgmp-dev \
         libssl-dev \
         ncurses-dev \
         python-dev \
