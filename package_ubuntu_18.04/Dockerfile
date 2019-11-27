@@ -12,6 +12,7 @@ RUN apt-get -qq update \
         erlang \
         dh-autoreconf \
         git \
+        libgmp-dev \
         libsodium-dev \
         libssl-dev \
         ncurses-dev \
