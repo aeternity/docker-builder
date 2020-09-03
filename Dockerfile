@@ -33,10 +33,10 @@ RUN LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/downl
     && cd libsodium-src \
     && ./configure && make -j$(nproc) && make install && ldconfig
 
-ENV REBAR3_VERSION="3.12.0"
+ENV REBAR3_VERSION="3.14.0"
 RUN set -xe \
     && REBAR3_DOWNLOAD_URL="https://github.com/erlang/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
-    && REBAR3_DOWNLOAD_SHA256="8ac45498f03e293bc6342ec431888f9a81a4fb9e1177a69965238d127c00a79e" \
+    && REBAR3_DOWNLOAD_SHA256="1e1a0d1d88d9b69311714eede8393a8a443cc53f9291755aa3c4da1f89a1132c" \
     && mkdir -p /usr/src/rebar3-src \
     && curl -fSL -o rebar3-src.tar.gz "$REBAR3_DOWNLOAD_URL" \
     && echo "$REBAR3_DOWNLOAD_SHA256 rebar3-src.tar.gz" | sha256sum -c - \
