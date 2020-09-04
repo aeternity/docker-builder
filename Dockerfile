@@ -13,17 +13,18 @@ RUN apt-get -qq update \
         python-dev \
         python-pip \
         unzip \
+        libwxbase3.0-dev \
+        libwxgtk3.0-dev \
+        libsctp1 \
     && rm -rf /var/lib/apt/lists/*
 
-ARG BUILD_OTP_VERSION="20.3.8.24"
+ARG BUILD_OTP_VERSION="22.3.4.9"
 ENV OTP_VERSION=$BUILD_OTP_VERSION
-RUN OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" \
-    && curl -fsSL -o otp-src.tar.gz "$OTP_DOWNLOAD_URL" \
-    && mkdir otp-src \
-    && tar -zxf otp-src.tar.gz -C otp-src --strip-components=1 \
-    && cd otp-src \
-    && export ERL_TOP=`pwd` \
-    && ./otp_build autoconf && ./configure && make -j$(nproc) && make install
+RUN PACKAGE_NAME=esl-erlang_${OTP_VERSION}-1~ubuntu~xenial_amd64.deb \
+    && OTP_DOWNLOAD_URL=https://packages.erlang-solutions.com/erlang/debian/pool/${PACKAGE_NAME} \
+    && curl -fsSL -o ${PACKAGE_NAME} "$OTP_DOWNLOAD_URL" \
+    && dpkg -i ${PACKAGE_NAME} \
+    && rm esl-erlang_${OTP_VERSION}-1~ubuntu~xenial_amd64.deb
 
 ENV LIBSODIUM_VERSION=1.0.16
 RUN LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VERSION}/libsodium-${LIBSODIUM_VERSION}.tar.gz" \
