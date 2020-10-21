@@ -5,6 +5,7 @@ RUN apt-get -qq update \
         apt-transport-https \
         autoconf \
         build-essential \
+        cmake \
         curl \
         debhelper \
         default-jre-headless \
@@ -21,6 +22,12 @@ RUN apt-get -qq update \
         libwxbase3.0-dev \
         libwxgtk3.0-dev \
         libsctp1 \
+        libgflags-dev \
+        libsnappy-dev \
+        zlib1g-dev \
+        libbz2-dev \
+        liblz4-dev \
+        libzstd-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ARG BUILD_OTP_VERSION="22.3.4.9"
@@ -30,6 +37,17 @@ RUN PACKAGE_NAME=esl-erlang_${OTP_VERSION}-1~ubuntu~bionic_amd64.deb \
     && curl -fsSL -o ${PACKAGE_NAME} "$OTP_DOWNLOAD_URL" \
     && dpkg -i ${PACKAGE_NAME} \
     && rm esl-erlang_${OTP_VERSION}-1~ubuntu~bionic_amd64.deb
+
+ENV ROCKSDB_VERSION=6.13.3
+RUN set -xe \
+    && ROCKSDB_DOWNLOAD_URL="https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz" \
+    && ROCKSDB_DOWNLOAD_SHA256="b86741983c5842716128efc2eecc1a2f3bc86ba5125cf3111fb58d26fb195ff0" \
+    && curl -fsSL -o rocksdb-src.tar.gz "$ROCKSDB_DOWNLOAD_URL" \
+    && echo "$ROCKSDB_DOWNLOAD_SHA256 rocksdb-src.tar.gz" | sha256sum -c - \
+    && mkdir rocksdb-src \
+    && tar -zxf rocksdb-src.tar.gz -C rocksdb-src --strip-components=1 \
+    && cd rocksdb-src \
+    && make shared_lib && make install-shared && ldconfig
 
 ENV REBAR3_VERSION="3.14.0"
 RUN set -xe \
