@@ -74,7 +74,7 @@ jobs:
       - use_remote_docker
       - build_and_push:
           dockerfile: Dockerfile-xenial
-          otp_version: "23.0.3"
+          otp_version: "23.3.4.5"
           tag: "xenial-otp23"
 
   build_1804:
