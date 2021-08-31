@@ -77,7 +77,7 @@ jobs:
           otp_version: "23.3.4.5"
           tag: "xenial-otp23"
 
-  build_1804:
+  build_1804_otp22:
     executor: base
     steps:
       - checkout
@@ -86,6 +86,16 @@ jobs:
           dockerfile: Dockerfile-bionic
           otp_version: "22.3.4.9"
           tag: "bionic-otp22"
+
+  build_1804_otp23:
+    executor: base
+    steps:
+      - checkout
+      - use_remote_docker
+      - build_and_push:
+          dockerfile: Dockerfile-bionic
+          otp_version: "23.3.4.5"
+          tag: "bionic-otp23"
 
   deploy:
     executor: base
@@ -108,7 +118,14 @@ workflows:
             branches:
               ignore: master
 
-      - build_1804:
+      - build_1804_otp22:
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_1804_otp23:
           context: ae-dockerhub
           requires: []
           filters:
