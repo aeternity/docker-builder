@@ -97,6 +97,16 @@ jobs:
           otp_version: "23.3.4.5"
           tag: "bionic-otp23"
 
+  build_1804_otp24:
+    executor: base
+    steps:
+      - checkout
+      - use_remote_docker
+      - build_and_push:
+          dockerfile: Dockerfile-bionic
+          otp_version: "24.1.4"
+          tag: "bionic-otp24"
+
   deploy:
     executor: base
     steps:
@@ -126,6 +136,13 @@ workflows:
               only: master
 
       - build_1804_otp23:
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_1804_otp24:
           context: ae-dockerhub
           requires: []
           filters:
