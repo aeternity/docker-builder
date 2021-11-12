@@ -49,10 +49,10 @@ RUN set -xe \
     && cd rocksdb-src \
     && make shared_lib && make install-shared && ldconfig
 
-ENV REBAR3_VERSION="3.14.0"
+ENV REBAR3_VERSION="3.17.0"
 RUN set -xe \
     && REBAR3_DOWNLOAD_URL="https://github.com/erlang/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
-    && REBAR3_DOWNLOAD_SHA256="1e1a0d1d88d9b69311714eede8393a8a443cc53f9291755aa3c4da1f89a1132c" \
+    && REBAR3_DOWNLOAD_SHA256="4c7f33a342bcab498f9bf53cc0ee5b698d9598b8fa9ef6a14bcdf44d21945c27" \
     && mkdir -p /usr/src/rebar3-src \
     && curl -fSL -o rebar3-src.tar.gz "$REBAR3_DOWNLOAD_URL" \
     && echo "$REBAR3_DOWNLOAD_SHA256 rebar3-src.tar.gz" | sha256sum -c - \
