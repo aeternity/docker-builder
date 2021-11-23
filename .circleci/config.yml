@@ -3,7 +3,7 @@ version: 2.1
 executors:
   base:
     docker:
-      - image: cimg/base:2021.02
+      - image: cimg/base:stable-18.04
     working_directory: ~/builder
     environment:
       DOCKERHUB_REPO: aeternity/builder
