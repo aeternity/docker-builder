@@ -6,6 +6,7 @@ RUN apt-get -qq update \
         build-essential \
         cmake \
         curl \
+        jq \
         default-jre-headless \
         git \
         libgmp-dev \

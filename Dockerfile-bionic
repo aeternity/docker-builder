@@ -7,6 +7,7 @@ RUN apt-get -qq update \
         build-essential \
         cmake \
         curl \
+        jq \
         debhelper \
         default-jre-headless \
         devscripts \
