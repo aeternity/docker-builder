@@ -6,13 +6,12 @@ RUN apt-get -qq update \
         build-essential \
         cmake \
         curl \
+        jq \
         default-jre-headless \
         git \
         libgmp-dev \
         libssl-dev \
         ncurses-dev \
-        python-dev \
-        python-pip \
         unzip \
         libwxbase3.0-dev \
         libwxgtk3.0-dev \
@@ -65,8 +64,6 @@ RUN set -xe \
     && HOME=$PWD ./bootstrap \
     && install -v ./rebar3 /usr/local/bin/ \
     && rm -rf /usr/src/rebar3-src
-
-RUN pip install virtualenv awscli
 
 # Add non-root user in case some app won't run as root
 RUN useradd --shell /bin/bash builder --create-home
