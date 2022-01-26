@@ -7,7 +7,6 @@ executors:
     working_directory: ~/builder
     environment:
       DOCKERHUB_REPO: aeternity/builder
-      DOCKER_CLIENT_VERSION: "17.09.0-ce"
       DOCKERFILE_PATH: "."
 
 commands:
@@ -15,7 +14,6 @@ commands:
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
-          version: "17.09.0-ce"
   build_and_push:
     parameters:
       dockerfile:
