@@ -47,35 +47,35 @@ jobs:
           otp_version: "22.3.4.9"
           tag: ci-xenial-otp22-<< pipeline.git.branch >>
 
-  build_1604_otp21:
+  build_2004_otp21:
     executor: base
     steps:
       - checkout
       - use_remote_docker
       - build_and_push:
-          dockerfile: Dockerfile-xenial
+          dockerfile: Dockerfile-focal
           otp_version: "21.3.8.17"
-          tag: "xenial-otp21"
+          tag: "focal-otp21"
 
-  build_1604_otp22:
+  build_2004_otp22:
     executor: base
     steps:
       - checkout
       - use_remote_docker
       - build_and_push:
-          dockerfile: Dockerfile-xenial
+          dockerfile: Dockerfile-focal
           otp_version: "22.3.4.9"
-          tag: "xenial-otp22"
+          tag: "focal-otp22"
 
-  build_1604_otp23:
+  build_2004_otp23:
     executor: base
     steps:
       - checkout
       - use_remote_docker
       - build_and_push:
-          dockerfile: Dockerfile-xenial
+          dockerfile: Dockerfile-focal
           otp_version: "23.3.4.5"
-          tag: "xenial-otp23"
+          tag: "focal-otp23"
 
   build_1804_otp22:
     executor: base
@@ -113,7 +113,7 @@ jobs:
       - checkout
       - use_remote_docker
       - build_and_push:
-          dockerfile: Dockerfile-xenial
+          dockerfile: Dockerfile-bionic
           otp_version: "22.3.4.9"
           tag: latest
 
@@ -149,21 +149,21 @@ workflows:
             branches:
               only: master
 
-      - build_1604_otp21:
+      - build_2004_otp21:
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
-      - build_1604_otp22:
+      - build_2004_otp22:
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
-      - build_1604_otp23:
+      - build_2004_otp23:
           context: ae-dockerhub
           requires: []
           filters:
