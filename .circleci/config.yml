@@ -43,9 +43,9 @@ jobs:
       - checkout
       - use_remote_docker
       - build_and_push:
-          dockerfile: Dockerfile-xenial
+          dockerfile: Dockerfile-bionic
           otp_version: "22.3.4.9"
-          tag: ci-xenial-otp22-<< pipeline.git.branch >>
+          tag: ci-bionic-otp22-<< pipeline.git.branch >>
 
   build_2004_otp21:
     executor: base
