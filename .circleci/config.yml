@@ -24,6 +24,9 @@ commands:
         type: string
       tag:
         type: string
+      latest:
+        type: boolean
+        default: false
     steps:
       - run:
           name: Build Docker image
@@ -35,143 +38,118 @@ commands:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push $DOCKERHUB_REPO:<< parameters.tag >>
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Tag and push latest
+                command: |
+                  docker tag $DOCKERHUB_REPO:<< parameters.tag >> $DOCKERHUB_REPO:latest
+                  docker push $DOCKERHUB_REPO:latest
 
 jobs:
-  build:
+  build_and_push:
     executor: base
+    parameters:
+      distro:
+        type: string
+      otp_version:
+        type: string
+      tag:
+        type: string
+        default: bionic-otp22
+      latest:
+        type: boolean
+        default: false
     steps:
       - checkout
       - use_remote_docker
       - build_and_push:
-          dockerfile: Dockerfile-bionic
-          otp_version: "22.3.4.9"
-          tag: ci-bionic-otp22-<< pipeline.git.branch >>
-
-  build_2004_otp21:
-    executor: base
-    steps:
-      - checkout
-      - use_remote_docker
-      - build_and_push:
-          dockerfile: Dockerfile-focal
-          otp_version: "21.3.8.17"
-          tag: "focal-otp21"
-
-  build_2004_otp22:
-    executor: base
-    steps:
-      - checkout
-      - use_remote_docker
-      - build_and_push:
-          dockerfile: Dockerfile-focal
-          otp_version: "22.3.4.9"
-          tag: "focal-otp22"
-
-  build_2004_otp23:
-    executor: base
-    steps:
-      - checkout
-      - use_remote_docker
-      - build_and_push:
-          dockerfile: Dockerfile-focal
-          otp_version: "23.3.4.5"
-          tag: "focal-otp23"
-
-  build_1804_otp22:
-    executor: base
-    steps:
-      - checkout
-      - use_remote_docker
-      - build_and_push:
-          dockerfile: Dockerfile-bionic
-          otp_version: "22.3.4.9"
-          tag: "bionic-otp22"
-
-  build_1804_otp23:
-    executor: base
-    steps:
-      - checkout
-      - use_remote_docker
-      - build_and_push:
-          dockerfile: Dockerfile-bionic
-          otp_version: "23.3.4.5"
-          tag: "bionic-otp23"
-
-  build_1804_otp24:
-    executor: base
-    steps:
-      - checkout
-      - use_remote_docker
-      - build_and_push:
-          dockerfile: Dockerfile-bionic
-          otp_version: "24.1.3"
-          tag: "bionic-otp24"
-
-  deploy:
-    executor: base
-    steps:
-      - checkout
-      - use_remote_docker
-      - build_and_push:
-          dockerfile: Dockerfile-bionic
-          otp_version: "22.3.4.9"
-          tag: latest
+          dockerfile: Dockerfile-<< parameters.distro >>
+          otp_version: << parameters.otp_version >>
+          tag: << parameters.tag >>
+          latest: << parameters.latest >>
 
 workflows:
   version: 2
-  build_deploy:
+  commit:
     jobs:
-      - build:
+      - build_and_push:
+          name: "build_1804_otp22"
+          distro: "bionic"
+          otp_version: "22.3.4.9"
+          tag: ci-bionic-otp22-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               ignore: master
 
-      - build_1804_otp22:
+  release:
+    jobs:
+      - build_and_push:
+          name: "build_1804_otp22"
+          distro: "bionic"
+          otp_version: "22.3.4.9"
+          tag: "bionic-otp22"
+          latest: true
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
-      - build_1804_otp23:
+      - build_and_push:
+          name: "build_1804_otp23"
+          distro: "bionic"
+          otp_version: "23.3.4.5"
+          tag: "bionic-otp23"
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
-      - build_1804_otp24:
+      - build_and_push:
+          name: "build_1804_otp24"
+          distro: "bionic"
+          otp_version: "24.1.3"
+          tag: "bionic-otp24"
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
-      - build_2004_otp21:
+      - build_and_push:
+          name: "build_2004_otp22"
+          distro: "focal"
+          otp_version: "22.3.4.9"
+          tag: "focal-otp22"
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
-      - build_2004_otp22:
+      - build_and_push:
+          name: "build_2004_otp23"
+          distro: "focal"
+          otp_version: "23.3.4.5"
+          tag: "focal-otp23"
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               only: master
 
-      - build_2004_otp23:
+      - build_and_push:
+          name: "build_2004_otp24"
+          distro: "focal"
+          otp_version: "24.1.3"
+          tag: "focal-otp24"
           context: ae-dockerhub
           requires: []
-          filters:
-            branches:
-              only: master
-
-      - deploy:
-          context: ae-dockerhub
           filters:
             branches:
               only: master
