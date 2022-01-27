@@ -84,6 +84,16 @@ workflows:
           filters:
             branches:
               ignore: master
+      - build_and_push:
+          name: "build_2004_otp22"
+          distro: "focal"
+          otp_version: "22.3.4.9"
+          tag: ci-focal-otp22-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
 
   release:
     jobs:
