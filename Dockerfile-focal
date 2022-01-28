@@ -32,11 +32,11 @@ RUN apt-get -qq update \
 
 ARG BUILD_OTP_VERSION="22.3.4.9"
 ENV OTP_VERSION=$BUILD_OTP_VERSION
-RUN PACKAGE_NAME=esl-erlang_${OTP_VERSION}-1~ubuntu~focal_amd64.deb \
+RUN PACKAGE_NAME=esl-erlang_${OTP_VERSION}-1~ubuntu~focal_$(dpkg --print-architecture).deb \
     && OTP_DOWNLOAD_URL=https://packages.erlang-solutions.com/erlang/debian/pool/${PACKAGE_NAME} \
     && curl -fsSL -o ${PACKAGE_NAME} "$OTP_DOWNLOAD_URL" \
     && dpkg -i ${PACKAGE_NAME} \
-    && rm esl-erlang_${OTP_VERSION}-1~ubuntu~focal_amd64.deb
+    && rm esl-erlang_${OTP_VERSION}-1~ubuntu~focal_$(dpkg --print-architecture).deb
 
 ENV ROCKSDB_VERSION=6.13.3
 RUN set -xe \
