@@ -9,6 +9,7 @@ executors:
       DOCKERHUB_REPO: aeternity/builder
       DOCKER_CLIENT_VERSION: "20.10.11"
       DOCKERFILE_PATH: "."
+      BUILDX_PLATFORMS: linux/amd64,linux/arm64
 
 commands:
   use_remote_docker:
@@ -31,15 +32,16 @@ commands:
       - run:
           name: Setup buildx
           command: |
+            docker run --rm --privileged docker/binfmt:qemu-v6.1.0 --install $BUILDX_PLATFORMS
             docker context create aeternity
-            docker buildx create --use --platform linux/amd64,linux/arm64 aeternity
+            docker buildx create --use --platform $BUILDX_PLATFORMS aeternity
       - run:
           name: Build Docker image
           environment:
             DOCKER_CLI_EXPERIMENTAL: enabled
           command: |
             docker buildx build --progress=plain -t $DOCKERHUB_REPO:<< parameters.tag >> \
-              --platform linux/amd64,linux/arm64 \
+              --platform $BUILDX_PLATFORMS \
               --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> - < << parameters.dockerfile >>
       - run:
           name: Push Docker image to docker.io registry
