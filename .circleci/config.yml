@@ -7,7 +7,7 @@ executors:
     working_directory: ~/builder
     environment:
       DOCKERHUB_REPO: aeternity/builder
-      DOCKER_CLIENT_VERSION: "17.09.0-ce"
+      DOCKER_CLIENT_VERSION: "20.10.11"
       DOCKERFILE_PATH: "."
 
 commands:
@@ -15,7 +15,7 @@ commands:
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
-          version: "17.09.0-ce"
+          version: "20.10.11"
   build_and_push:
     parameters:
       dockerfile:
@@ -27,11 +27,14 @@ commands:
       latest:
         type: boolean
         default: false
+    environment:
+      DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
       - run:
           name: Build Docker image
           command: |
-            docker build -t $DOCKERHUB_REPO:<< parameters.tag >> \
+            docker buildx build -t $DOCKERHUB_REPO:<< parameters.tag >> \
+              --platform linux/amd64,linux/arm64 \
               --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> - < << parameters.dockerfile >>
       - run:
           name: Push Docker image to docker.io registry
