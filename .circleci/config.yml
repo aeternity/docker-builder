@@ -32,7 +32,7 @@ commands:
       - run:
           name: Setup buildx
           command: |
-            docker run --rm --privileged docker/binfmt:qemu-v6.1.0 --install $BUILDX_PLATFORMS
+            docker run --rm --privileged tonistiigi/binfmt:qemu-v6.2.0 --install $BUILDX_PLATFORMS
             docker context create aeternity
             docker buildx create --use --platform $BUILDX_PLATFORMS aeternity
       - run:
