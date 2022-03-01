@@ -27,11 +27,11 @@ commands:
       latest:
         type: boolean
         default: false
-    environment:
-      DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
       - run:
           name: Build Docker image
+          environment:
+            DOCKER_CLI_EXPERIMENTAL: enabled
           command: |
             docker buildx build -t $DOCKERHUB_REPO:<< parameters.tag >> \
               --platform linux/amd64,linux/arm64 \
