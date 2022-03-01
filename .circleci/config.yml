@@ -29,15 +29,14 @@ commands:
         default: false
     steps:
       - run:
-          name: Setup buildx (docker experimental)
+          name: Setup buildx
           command: |
-            ssh remote-docker \<<EOF
-              sudo bash -c 'echo "{\"experimental\": true}" > /etc/docker/daemon.json'
-              sudo systemctl restart docker
-              sudo docker info
-            EOF
+            docker context create aeternity
+            docker buildx create --use --platform linux/amd64,linux/arm64 aeternity
       - run:
           name: Build Docker image
+          environment:
+            DOCKER_CLI_EXPERIMENTAL: enabled
           command: |
             docker buildx build -t $DOCKERHUB_REPO:<< parameters.tag >> \
               --platform linux/amd64,linux/arm64 \
