@@ -32,17 +32,20 @@ commands:
       - run:
           name: Setup buildx
           command: |
-            docker run --rm --privileged tonistiigi/binfmt:qemu-v6.2.0 --install $BUILDX_PLATFORMS
+            docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
             docker context create aeternity
             docker buildx create --use --platform $BUILDX_PLATFORMS aeternity
+            docker buildx inspect --bootstrap
       - run:
           name: Build Docker image
           environment:
             DOCKER_CLI_EXPERIMENTAL: enabled
           command: |
-            docker buildx build --progress=plain -t $DOCKERHUB_REPO:<< parameters.tag >> \
+            docker buildx build --progress=plain --push \
+              -t $DOCKERHUB_REPO:<< parameters.tag >> \
               --platform $BUILDX_PLATFORMS \
-              --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> - < << parameters.dockerfile >>
+              --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
+              - < << parameters.dockerfile >>
       - run:
           name: Push Docker image to docker.io registry
           command: |
