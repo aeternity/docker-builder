@@ -1,14 +1,20 @@
 version: 2.1
 
+parameters:
+  buildx-version:
+    type: string
+    default: "0.7.0"
+
 executors:
   base:
-    docker:
-      - image: cimg/base:stable-18.04
+    machine:
+      image: ubuntu-2004:current
     working_directory: ~/builder
     environment:
       DOCKERHUB_REPO: aeternity/builder
       DOCKER_CLIENT_VERSION: "20.10.11"
       DOCKERFILE_PATH: "."
+      DOCKER_CLI_EXPERIMENTAL: "enabled"
       BUILDX_PLATFORMS: linux/amd64,linux/arm64
 
 commands:
@@ -30,12 +36,26 @@ commands:
         default: false
     steps:
       - run:
+          name: Install emulation dependencies
+          command: |
+            sudo apt-get update && sudo apt-get install -y qemu binfmt-support qemu-user-static
+      - run:
+          name: Install buildx
+          command: |
+            mkdir -p ~/.docker/cli-plugins
+            baseUrl="https://github.com/docker/buildx/releases/download"
+            fileName="buildx-v<< pipeline.parameters.buildx-version >>.linux-amd64"
+            url="${baseUrl}/v<< pipeline.parameters.buildx-version >>/${fileName}"
+            curl -sSL -o ~/.docker/cli-plugins/docker-buildx $url
+            chmod a+x ~/.docker/cli-plugins/docker-buildx
+      - run:
           name: Setup buildx
           command: |
+            docker buildx install
             docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
             docker context create aeternity
             docker buildx create --use --platform $BUILDX_PLATFORMS aeternity
-            docker buildx inspect --bootstrap
+            docker buildx inspect --builder aeternity --bootstrap
       - run:
           name: Build Docker image
           environment:
@@ -76,7 +96,6 @@ jobs:
         default: false
     steps:
       - checkout
-      - use_remote_docker
       - build_and_push:
           dockerfile: Dockerfile-<< parameters.distro >>
           otp_version: << parameters.otp_version >>
