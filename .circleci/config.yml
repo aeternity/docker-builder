@@ -58,28 +58,36 @@ commands:
             docker buildx create --use --platform $BUILDX_PLATFORMS aeternity
             docker buildx inspect --builder aeternity --bootstrap
       - run:
-          name: Build Docker image
-          environment:
-            DOCKER_CLI_EXPERIMENTAL: enabled
-          command: |
-            docker buildx build --progress=plain --push \
-              -t $DOCKERHUB_REPO:<< parameters.tag >> \
-              --platform $BUILDX_PLATFORMS \
-              --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
-              - < << parameters.dockerfile >>
-      - run:
-          name: Push Docker image to docker.io registry
+          name: Login to docker.io registry
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker push $DOCKERHUB_REPO:<< parameters.tag >>
+      - unless:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Build and push docker image to docker.io registry
+                environment:
+                  DOCKER_CLI_EXPERIMENTAL: enabled
+                command: |
+                  docker buildx build --progress=plain --push \
+                    -t $DOCKERHUB_REPO:<< parameters.tag >> \
+                    --platform $BUILDX_PLATFORMS \
+                    --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
+                    - < << parameters.dockerfile >>
       - when:
           condition: << parameters.latest >>
           steps:
             - run:
-                name: Tag and push latest
+                name: Build and push docker image to docker.io registry
+                environment:
+                  DOCKER_CLI_EXPERIMENTAL: enabled
                 command: |
-                  docker tag $DOCKERHUB_REPO:<< parameters.tag >> $DOCKERHUB_REPO:latest
-                  docker push $DOCKERHUB_REPO:latest
+                  docker buildx build --progress=plain --push \
+                    -t $DOCKERHUB_REPO:<< parameters.tag >> \
+                    -t $DOCKERHUB_REPO:latest \
+                    --platform $BUILDX_PLATFORMS \
+                    --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
+                    - < << parameters.dockerfile >>
 
 jobs:
   build_and_push:
