@@ -38,10 +38,10 @@ RUN PACKAGE_NAME=esl-erlang_${OTP_VERSION}-1~ubuntu~focal_$(dpkg --print-archite
     && dpkg -i ${PACKAGE_NAME} \
     && rm esl-erlang_${OTP_VERSION}-1~ubuntu~focal_$(dpkg --print-architecture).deb
 
-ENV ROCKSDB_VERSION=6.13.3
+ENV ROCKSDB_VERSION=6.29.3
 RUN set -xe \
     && ROCKSDB_DOWNLOAD_URL="https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz" \
-    && ROCKSDB_DOWNLOAD_SHA256="b86741983c5842716128efc2eecc1a2f3bc86ba5125cf3111fb58d26fb195ff0" \
+    && ROCKSDB_DOWNLOAD_SHA256="724e4cba2db6668ff6a21ecabcce0782cd0c8e386796e7e9a14a8260e0600abd" \
     && curl -fsSL -o rocksdb-src.tar.gz "$ROCKSDB_DOWNLOAD_URL" \
     && echo "$ROCKSDB_DOWNLOAD_SHA256 rocksdb-src.tar.gz" | sha256sum -c - \
     && mkdir rocksdb-src \
