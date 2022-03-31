@@ -7,6 +7,14 @@ parameters:
 
 executors:
   base:
+    docker:
+      - image: cimg/base:stable-18.04
+    working_directory: ~/builder
+    environment:
+      DOCKERHUB_REPO: aeternity/builder
+      DOCKER_CLIENT_VERSION: "17.09.0-ce"
+      DOCKERFILE_PATH: "."
+  buildx:
     machine:
       image: ubuntu-2004:current
       resource_class: xlarge
@@ -25,6 +33,36 @@ commands:
           docker_layer_caching: true
           version: "20.10.11"
   build_and_push:
+    parameters:
+      dockerfile:
+        type: string
+      otp_version:
+        type: string
+      tag:
+        type: string
+      latest:
+        type: boolean
+        default: false
+    steps:
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t $DOCKERHUB_REPO:<< parameters.tag >> \
+              --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> - < << parameters.dockerfile >>
+      - run:
+          name: Push Docker image to docker.io registry
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push $DOCKERHUB_REPO:<< parameters.tag >>
+      - when:
+          condition: << parameters.latest >>
+          steps:
+            - run:
+                name: Tag and push latest
+                command: |
+                  docker tag $DOCKERHUB_REPO:<< parameters.tag >> $DOCKERHUB_REPO:latest
+                  docker push $DOCKERHUB_REPO:latest
+  buildx_and_push:
     parameters:
       dockerfile:
         type: string
@@ -105,7 +143,28 @@ jobs:
         default: false
     steps:
       - checkout
+      - use_remote_docker
       - build_and_push:
+          dockerfile: Dockerfile-<< parameters.distro >>
+          otp_version: << parameters.otp_version >>
+          tag: << parameters.tag >>
+          latest: << parameters.latest >>
+  buildx_and_push:
+    executor: buildx
+    parameters:
+      distro:
+        type: string
+      otp_version:
+        type: string
+      tag:
+        type: string
+        default: bionic-otp22
+      latest:
+        type: boolean
+        default: false
+    steps:
+      - checkout
+      - buildx_and_push:
           dockerfile: Dockerfile-<< parameters.distro >>
           otp_version: << parameters.otp_version >>
           tag: << parameters.tag >>
@@ -115,7 +174,7 @@ workflows:
   version: 2
   commit:
     jobs:
-      - build_and_push:
+      - buildx_and_push:
           name: "build_1804_otp22"
           distro: "bionic"
           otp_version: "22.3.4.9"
@@ -138,7 +197,7 @@ workflows:
 
   release:
     jobs:
-      - build_and_push:
+      - buildx_and_push:
           name: "build_1804_otp22"
           distro: "bionic"
           otp_version: "22.3.4.9"
