@@ -47,7 +47,7 @@ RUN set -xe \
     && mkdir rocksdb-src \
     && tar -zxf rocksdb-src.tar.gz -C rocksdb-src --strip-components=1 \
     && cd rocksdb-src \
-    && make shared_lib && make install-shared && ldconfig
+    && PORTABLE=1 make shared_lib && make install-shared && ldconfig
 
 ENV REBAR3_VERSION="3.17.0"
 RUN set -xe \
