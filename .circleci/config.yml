@@ -93,11 +93,11 @@ commands:
             docker buildx install
             docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
             docker run --rm --privileged tonistiigi/binfmt --install arm64
-            docker context create aeternity
+            docker context create aeternity_ctx
             docker context list
-            docker buildx create --bootstrap --use --name aeternity --platform $BUILDX_PLATFORMS aeternity
+            docker buildx create --bootstrap --use --name aeternity_builder --platform $BUILDX_PLATFORMS aeternity_ctx
             docker buildx ls
-            docker buildx inspect --builder aeternity
+            docker buildx inspect --builder aeternity_builder
       - run:
           name: Login to docker.io registry
           command: |
@@ -110,9 +110,9 @@ commands:
                 environment:
                   DOCKER_CLI_EXPERIMENTAL: enabled
                 command: |
-                  docker --context=aeternity buildx build --progress=plain --push \
+                  docker --context=aeternity_ctx buildx build --progress=plain --push \
                     -t $DOCKERHUB_REPO:<< parameters.tag >> \
-                    --builder aeternity \
+                    --builder aeternity_builder \
                     --platform $BUILDX_PLATFORMS \
                     --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
                     - < << parameters.dockerfile >>
@@ -124,10 +124,10 @@ commands:
                 environment:
                   DOCKER_CLI_EXPERIMENTAL: enabled
                 command: |
-                  docker --context=aeternity buildx build --progress=plain --push \
+                  docker --context=aeternity_ctx buildx build --progress=plain --push \
                     -t $DOCKERHUB_REPO:<< parameters.tag >> \
                     -t $DOCKERHUB_REPO:latest \
-                    --builder aeternity \
+                    --builder aeternity_builder \
                     --platform $BUILDX_PLATFORMS \
                     --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
                     - < << parameters.dockerfile >>
