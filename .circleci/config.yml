@@ -109,7 +109,7 @@ commands:
                 environment:
                   DOCKER_CLI_EXPERIMENTAL: enabled
                 command: |
-                  docker buildx build --progress=plain --push \
+                  docker --context=aeternity buildx build --progress=plain --push \
                     -t $DOCKERHUB_REPO:<< parameters.tag >> \
                     --builder aeternity \
                     --platform $BUILDX_PLATFORMS \
@@ -123,7 +123,7 @@ commands:
                 environment:
                   DOCKER_CLI_EXPERIMENTAL: enabled
                 command: |
-                  docker buildx build --progress=plain --push \
+                  docker --context=aeternity buildx build --progress=plain --push \
                     -t $DOCKERHUB_REPO:<< parameters.tag >> \
                     -t $DOCKERHUB_REPO:latest \
                     --builder aeternity \
