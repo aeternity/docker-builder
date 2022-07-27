@@ -92,6 +92,7 @@ commands:
           command: |
             docker buildx install
             docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+            docker run --rm --privileged tonistiigi/binfmt --install arm64
             docker context create aeternity
             docker context list
             docker buildx create --bootstrap --use --name aeternity --platform $BUILDX_PLATFORMS aeternity
