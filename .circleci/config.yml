@@ -15,9 +15,9 @@ executors:
       DOCKER_CLIENT_VERSION: "17.09.0-ce"
       DOCKERFILE_PATH: "."
   buildx:
-    machine:
-      image: ubuntu-2004:current
-      resource_class: xlarge
+    docker:
+      - image: cimg/base:stable-18.04
+        user: root
     working_directory: ~/builder
     environment:
       DOCKERHUB_REPO: aeternity/builder
@@ -164,6 +164,7 @@ jobs:
         default: false
     steps:
       - checkout
+      - use_remote_docker
       - buildx_and_push:
           dockerfile: Dockerfile-<< parameters.distro >>
           otp_version: << parameters.otp_version >>
