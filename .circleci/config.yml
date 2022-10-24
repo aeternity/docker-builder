@@ -174,7 +174,7 @@ workflows:
   version: 2
   commit:
     jobs:
-      - build_and_push:
+      - buildx_and_push:
           name: "build_1804_otp23"
           distro: "bionic"
           otp_version: "23.3.4.5"
