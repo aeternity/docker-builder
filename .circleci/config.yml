@@ -30,7 +30,7 @@ commands:
   use_remote_docker:
     steps:
       - setup_remote_docker:
-          docker_layer_caching: true
+          # docker_layer_caching: true
           version: "20.10.11"
   build_and_push:
     parameters:
