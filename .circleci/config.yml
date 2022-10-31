@@ -24,7 +24,7 @@ executors:
       DOCKER_CLIENT_VERSION: "20.10.11"
       DOCKERFILE_PATH: "."
       DOCKER_CLI_EXPERIMENTAL: "enabled"
-      BUILDX_PLATFORMS: linux/amd64,linux/arm64
+      BUILDX_PLATFORMS: linux/arm64,linux/amd64
 
 commands:
   use_remote_docker:
