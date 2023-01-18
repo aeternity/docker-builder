@@ -3,7 +3,7 @@ version: 2.1
 parameters:
   buildx-version:
     type: string
-    default: "0.7.0"
+    default: "0.10.0"
 
 executors:
   base:
