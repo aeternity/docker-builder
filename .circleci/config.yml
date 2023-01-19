@@ -4,34 +4,30 @@ parameters:
   buildx-version:
     type: string
     default: "0.10.0"
+  docker_repo:
+    type: string
+    default: aeternity/aeternity
+  buildx_platforms:
+    type: string
+    default: linux/arm64,linux/amd64
 
 executors:
   base:
     docker:
       - image: cimg/base:stable-18.04
     working_directory: ~/builder
-    environment:
-      DOCKERHUB_REPO: aeternity/builder
-      DOCKER_CLIENT_VERSION: "17.09.0-ce"
-      DOCKERFILE_PATH: "."
   buildx:
-    machine:
-      image: ubuntu-2004:current
-      resource_class: xlarge
-    working_directory: ~/builder
-    environment:
-      DOCKERHUB_REPO: aeternity/builder
-      DOCKER_CLIENT_VERSION: "20.10.11"
-      DOCKERFILE_PATH: "."
-      DOCKER_CLI_EXPERIMENTAL: "enabled"
-      BUILDX_PLATFORMS: linux/arm64,linux/amd64
+    docker:
+      - image: cimg/base:stable
+    resource_class: xlarge
+    working_directory: /home/circleci/aeternity
 
 commands:
   use_remote_docker:
     steps:
       - setup_remote_docker:
           # docker_layer_caching: true
-          version: "20.10.11"
+          version: "20.10.18"
   build_and_push:
     parameters:
       dockerfile:
@@ -47,21 +43,21 @@ commands:
       - run:
           name: Build Docker image
           command: |
-            docker build -t $DOCKERHUB_REPO:<< parameters.tag >> \
+            docker build -t << pipeline.parameters.docker_repo >>:<< parameters.tag >> \
               --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> - < << parameters.dockerfile >>
       - run:
           name: Push Docker image to docker.io registry
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker push $DOCKERHUB_REPO:<< parameters.tag >>
+            docker push << pipeline.parameters.docker_repo >>:<< parameters.tag >>
       - when:
           condition: << parameters.latest >>
           steps:
             - run:
                 name: Tag and push latest
                 command: |
-                  docker tag $DOCKERHUB_REPO:<< parameters.tag >> $DOCKERHUB_REPO:latest
-                  docker push $DOCKERHUB_REPO:latest
+                  docker tag << pipeline.parameters.docker_repo >>:<< parameters.tag >> << pipeline.parameters.docker_repo >>:latest
+                  docker push << pipeline.parameters.docker_repo >>:latest
   buildx_and_push:
     parameters:
       dockerfile:
@@ -75,27 +71,6 @@ commands:
         default: false
     steps:
       - run:
-          name: Install emulation dependencies
-          command: |
-            sudo apt-get update && sudo apt-get install -y qemu binfmt-support qemu-user-static
-      - run:
-          name: Install buildx
-          command: |
-            mkdir -p ~/.docker/cli-plugins
-            baseUrl="https://github.com/docker/buildx/releases/download"
-            fileName="buildx-v<< pipeline.parameters.buildx-version >>.linux-amd64"
-            url="${baseUrl}/v<< pipeline.parameters.buildx-version >>/${fileName}"
-            curl -sSL -o ~/.docker/cli-plugins/docker-buildx $url
-            chmod a+x ~/.docker/cli-plugins/docker-buildx
-      - run:
-          name: Setup buildx
-          command: |
-            docker buildx install
-            docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-            docker context create aeternity
-            docker buildx create --use --platform $BUILDX_PLATFORMS aeternity
-            docker buildx inspect --builder aeternity --bootstrap
-      - run:
           name: Login to docker.io registry
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
@@ -104,12 +79,10 @@ commands:
           steps:
             - run:
                 name: Build and push docker image to docker.io registry
-                environment:
-                  DOCKER_CLI_EXPERIMENTAL: enabled
                 command: |
                   docker buildx build --progress=plain --push \
-                    -t $DOCKERHUB_REPO:<< parameters.tag >> \
-                    --platform $BUILDX_PLATFORMS \
+                    -t << pipeline.parameters.docker_repo >>:<< parameters.tag >> \
+                    --platform << pipeline.parameters.buildx_platforms >> \
                     --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
                     - < << parameters.dockerfile >>
       - when:
@@ -117,13 +90,11 @@ commands:
           steps:
             - run:
                 name: Build and push docker image to docker.io registry
-                environment:
-                  DOCKER_CLI_EXPERIMENTAL: enabled
                 command: |
                   docker buildx build --progress=plain --push \
-                    -t $DOCKERHUB_REPO:<< parameters.tag >> \
-                    -t $DOCKERHUB_REPO:latest \
-                    --platform $BUILDX_PLATFORMS \
+                    -t << pipeline.parameters.docker_repo >>:<< parameters.tag >> \
+                    -t << pipeline.parameters.docker_repo >>:latest \
+                    --platform << pipeline.parameters.buildx_platforms >> \
                     --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
                     - < << parameters.dockerfile >>
 
