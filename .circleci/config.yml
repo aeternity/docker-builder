@@ -135,6 +135,7 @@ jobs:
         default: false
     steps:
       - checkout
+      - use_remote_docker
       - buildx_and_push:
           dockerfile: Dockerfile-<< parameters.distro >>
           otp_version: << parameters.otp_version >>
