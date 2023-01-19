@@ -80,7 +80,7 @@ commands:
             docker buildx install
             docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
             docker context create aeternity
-            docker buildx create --use --platform $BUILDX_PLATFORMS aeternity
+            docker buildx create --use --platform << pipeline.parameters.buildx_platforms >> aeternity
             docker buildx inspect --builder aeternity --bootstrap
       - unless:
           condition: << parameters.latest >>
