@@ -74,6 +74,14 @@ commands:
           name: Login to docker.io registry
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run:
+          name: Setup buildx
+          command: |
+            docker buildx install
+            docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+            docker context create aeternity
+            docker buildx create --use --platform $BUILDX_PLATFORMS aeternity
+            docker buildx inspect --builder aeternity --bootstrap
       - unless:
           condition: << parameters.latest >>
           steps:
