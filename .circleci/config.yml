@@ -16,10 +16,15 @@ executors:
     docker:
       - image: cimg/base:stable-18.04
     working_directory: ~/builder
-  buildx:
+  amd64:
     docker:
       - image: cimg/base:stable
     resource_class: xlarge
+    working_directory: /home/circleci/aeternity
+  arm64:
+    docker:
+      - image: cimg/base:stable
+    resource_class: arm.2xlarge
     working_directory: /home/circleci/aeternity
 
 commands:
@@ -108,8 +113,11 @@ commands:
 
 jobs:
   build_and_push:
-    executor: base
+    executor: << parameters.platform >>
     parameters:
+      platform:
+        type: string
+        default: amd64
       distro:
         type: string
       otp_version:
@@ -129,7 +137,7 @@ jobs:
           tag: << parameters.tag >>
           latest: << parameters.latest >>
   buildx_and_push:
-    executor: buildx
+    executor: amd64
     parameters:
       distro:
         type: string
@@ -154,11 +162,23 @@ workflows:
   version: 2
   commit:
     jobs:
-      - buildx_and_push:
-          name: "build_1804_otp23"
+      - build_and_push:
+          name: "build_1804_otp23_amd64"
+          platform: amd64
           distro: "bionic"
           otp_version: "23.3.4.5"
-          tag: ci-bionic-otp23-<< pipeline.git.branch >>
+          tag: ci-bionic-otp23-amd64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+      - build_and_push:
+          name: "build_1804_otp23_arm64"
+          platform: arm64
+          distro: "bionic"
+          otp_version: "23.3.4.5"
+          tag: ci-bionic-otp23-arm64-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
           filters:
@@ -169,6 +189,16 @@ workflows:
           distro: "focal"
           otp_version: "23.3.4.5"
           tag: ci-focal-otp23-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+      - buildx_and_push:
+          name: "build_2204_otp23"
+          distro: "jammy"
+          otp_version: "23.3.4.5"
+          tag: ci-jammy-otp23-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
           filters:

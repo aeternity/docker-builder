@@ -1,5 +1,7 @@
 FROM ubuntu:18.04
 
+RUN echo "I'm building for $TARGETARCH"
+
 RUN apt-get -qq update \
     && apt-get -qq -y install \
         apt-transport-https \
