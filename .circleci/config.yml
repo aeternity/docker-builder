@@ -24,7 +24,7 @@ executors:
   arm64:
     docker:
       - image: cimg/base:stable
-    resource_class: arm.2xlarge
+    resource_class: arm.xlarge
     working_directory: /home/circleci/aeternity
 
 commands:
