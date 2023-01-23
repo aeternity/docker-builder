@@ -6,7 +6,7 @@ parameters:
     default: "0.10.0"
   docker_repo:
     type: string
-    default: aeternity/aeternity
+    default: aeternity/builder
   buildx_platforms:
     type: string
     default: linux/arm64,linux/amd64
@@ -16,12 +16,10 @@ executors:
     machine:
       image: ubuntu-2004:current
     resource_class: xlarge
-    working_directory: /home/circleci/aeternity
   arm64:
     machine:
       image: ubuntu-2004:current
     resource_class: arm.xlarge
-    working_directory: /home/circleci/aeternity
 
 commands:
   use_remote_docker:
