@@ -12,18 +12,14 @@ parameters:
     default: linux/arm64,linux/amd64
 
 executors:
-  base:
-    docker:
-      - image: cimg/base:stable-18.04
-    working_directory: ~/builder
   amd64:
-    docker:
-      - image: cimg/base:stable
+    machine:
+      image: ubuntu-2004:current
     resource_class: xlarge
     working_directory: /home/circleci/aeternity
   arm64:
-    docker:
-      - image: cimg/base:stable
+    machine:
+      image: ubuntu-2004:current
     resource_class: arm.xlarge
     working_directory: /home/circleci/aeternity
 
@@ -130,7 +126,6 @@ jobs:
         default: false
     steps:
       - checkout
-      - use_remote_docker
       - build_and_push:
           dockerfile: Dockerfile-<< parameters.distro >>
           otp_version: << parameters.otp_version >>
@@ -151,7 +146,6 @@ jobs:
         default: false
     steps:
       - checkout
-      - use_remote_docker
       - buildx_and_push:
           dockerfile: Dockerfile-<< parameters.distro >>
           otp_version: << parameters.otp_version >>
