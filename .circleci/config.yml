@@ -102,6 +102,31 @@ commands:
                     --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
                     - < << parameters.dockerfile >>
 
+  docker_manifest:
+    parameters:
+      manifest_list:
+        type: string
+      tag:
+        type: string
+    steps:
+      - run:
+          name: Create docker manifest
+          command: |
+            read -a MANIFEST_LIST_ARRAY \<<< "<< parameters.manifest_list >>"
+            PREFIX="<< pipeline.parameters.docker_repo >>:"
+            MANIFEST_LIST="${MANIFEST_LIST_ARRAY[@]/#/$PREFIX}"
+            docker manifest create \
+              << pipeline.parameters.docker_repo >>:<< parameters.tag >> \
+              $MANIFEST_LIST
+      - run:
+          name: Login to docker.io registry
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run:
+          name: Push docker manifest
+          command: |
+            docker manifest push << pipeline.parameters.docker_repo >>:<< parameters.tag >>
+
 jobs:
   build_and_push:
     executor: << parameters.platform >>
@@ -146,15 +171,27 @@ jobs:
           otp_version: << parameters.otp_version >>
           tag: << parameters.tag >>
           latest: << parameters.latest >>
+  docker_manifest:
+    executor: amd64
+    parameters:
+      manifest_list:
+        type: string
+      tag:
+        type: string
+    steps:
+      - docker_manifest:
+          manifest_list: << parameters.manifest_list >>
+          tag: << parameters.tag >>
 
 workflows:
   version: 2
   commit:
     jobs:
-      - buildx_and_push:
-          name: "build_1804_otp23"
-          distro: "bionic"
-          otp_version: "23.3.4.5"
+      - docker_manifest:
+          name: "manifest_test"
+          manifest_list: >-
+            ci-bionic-otp23-amd64-<< pipeline.git.branch >>
+            ci-bionic-otp23-arm64-<< pipeline.git.branch >>
           tag: ci-bionic-otp23-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
@@ -162,16 +199,40 @@ workflows:
             branches:
               ignore: master
 
-      - build_and_push:
-          name: "build_2004_otp23"
-          distro: "focal"
-          otp_version: "23.3.4.5"
-          tag: ci-focal-otp23-<< pipeline.git.branch >>
-          context: ae-dockerhub
-          requires: []
-          filters:
-            branches:
-              ignore: master
+      # - build_and_push:
+      #     name: "build_1804_otp23_amd64"
+      #     platform: amd64
+      #     distro: "bionic"
+      #     otp_version: "23.3.4.5"
+      #     tag: ci-bionic-otp23-arm64-<< pipeline.git.branch >>
+      #     context: ae-dockerhub
+      #     requires: []
+      #     filters:
+      #       branches:
+      #         ignore: master
+
+      # - build_and_push:
+      #     name: "build_1804_otp23_arm64"
+      #     platform: arm64
+      #     distro: "bionic"
+      #     otp_version: "23.3.4.5"
+      #     tag: ci-bionic-otp23-arm64-<< pipeline.git.branch >>
+      #     context: ae-dockerhub
+      #     requires: []
+      #     filters:
+      #       branches:
+      #         ignore: master
+
+      # - build_and_push:
+      #     name: "build_2004_otp23"
+      #     distro: "focal"
+      #     otp_version: "23.3.4.5"
+      #     tag: ci-focal-otp23-<< pipeline.git.branch >>
+      #     context: ae-dockerhub
+      #     requires: []
+      #     filters:
+      #       branches:
+      #         ignore: master
 
   release:
     jobs:
