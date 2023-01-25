@@ -187,52 +187,54 @@ workflows:
   version: 2
   commit:
     jobs:
-      - docker_manifest:
-          name: "manifest_test"
-          manifest_list: >-
-            ci-bionic-otp23-amd64-<< pipeline.git.branch >>
-            ci-bionic-otp23-arm64-<< pipeline.git.branch >>
-          tag: ci-bionic-otp23-<< pipeline.git.branch >>
+      - build_and_push:
+          name: "build_1804_otp23_amd64"
+          platform: amd64
+          distro: "bionic"
+          otp_version: "23.3.4.5"
+          tag: ci-bionic-otp23-arm64-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
           filters:
             branches:
               ignore: master
 
-      # - build_and_push:
-      #     name: "build_1804_otp23_amd64"
-      #     platform: amd64
-      #     distro: "bionic"
-      #     otp_version: "23.3.4.5"
-      #     tag: ci-bionic-otp23-arm64-<< pipeline.git.branch >>
-      #     context: ae-dockerhub
-      #     requires: []
-      #     filters:
-      #       branches:
-      #         ignore: master
+      - build_and_push:
+          name: "build_1804_otp23_arm64"
+          platform: arm64
+          distro: "bionic"
+          otp_version: "23.3.4.5"
+          tag: ci-bionic-otp23-arm64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
 
-      # - build_and_push:
-      #     name: "build_1804_otp23_arm64"
-      #     platform: arm64
-      #     distro: "bionic"
-      #     otp_version: "23.3.4.5"
-      #     tag: ci-bionic-otp23-arm64-<< pipeline.git.branch >>
-      #     context: ae-dockerhub
-      #     requires: []
-      #     filters:
-      #       branches:
-      #         ignore: master
+      - docker_manifest:
+          name: "manifest_push"
+          manifest_list: >-
+            ci-bionic-otp23-amd64-<< pipeline.git.branch >>
+            ci-bionic-otp23-arm64-<< pipeline.git.branch >>
+          tag: ci-bionic-otp23-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires:
+            - build_1804_otp23_amd64
+            - build_1804_otp23_arm64
+          filters:
+            branches:
+              ignore: master
 
-      # - build_and_push:
-      #     name: "build_2004_otp23"
-      #     distro: "focal"
-      #     otp_version: "23.3.4.5"
-      #     tag: ci-focal-otp23-<< pipeline.git.branch >>
-      #     context: ae-dockerhub
-      #     requires: []
-      #     filters:
-      #       branches:
-      #         ignore: master
+      - build_and_push:
+          name: "build_2004_otp23"
+          distro: "focal"
+          otp_version: "23.3.4.5"
+          tag: ci-focal-otp23-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
 
   release:
     jobs:
