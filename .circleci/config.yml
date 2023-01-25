@@ -1,15 +1,9 @@
 version: 2.1
 
 parameters:
-  buildx-version:
-    type: string
-    default: "0.10.0"
   docker_repo:
     type: string
     default: aeternity/builder
-  buildx_platforms:
-    type: string
-    default: linux/arm64,linux/amd64
 
 executors:
   amd64:
@@ -54,53 +48,6 @@ commands:
                 command: |
                   docker tag << pipeline.parameters.docker_repo >>:<< parameters.tag >> << pipeline.parameters.docker_repo >>:latest
                   docker push << pipeline.parameters.docker_repo >>:latest
-  buildx_and_push:
-    parameters:
-      dockerfile:
-        type: string
-      otp_version:
-        type: string
-      tag:
-        type: string
-      latest:
-        type: boolean
-        default: false
-    steps:
-      - run:
-          name: Login to docker.io registry
-          command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run:
-          name: Setup buildx
-          command: |
-            docker buildx install
-            docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-            docker context create aeternity
-            docker buildx create --use --platform << pipeline.parameters.buildx_platforms >> aeternity
-            docker buildx inspect --builder aeternity --bootstrap
-      - unless:
-          condition: << parameters.latest >>
-          steps:
-            - run:
-                name: Build and push docker image to docker.io registry
-                command: |
-                  docker buildx build --progress=plain --push \
-                    -t << pipeline.parameters.docker_repo >>:<< parameters.tag >> \
-                    --platform << pipeline.parameters.buildx_platforms >> \
-                    --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
-                    - < << parameters.dockerfile >>
-      - when:
-          condition: << parameters.latest >>
-          steps:
-            - run:
-                name: Build and push docker image to docker.io registry
-                command: |
-                  docker buildx build --progress=plain --push \
-                    -t << pipeline.parameters.docker_repo >>:<< parameters.tag >> \
-                    -t << pipeline.parameters.docker_repo >>:latest \
-                    --platform << pipeline.parameters.buildx_platforms >> \
-                    --build-arg BUILD_OTP_VERSION=<< parameters.otp_version >> \
-                    - < << parameters.dockerfile >>
 
   docker_manifest:
     parameters:
@@ -151,26 +98,6 @@ jobs:
           otp_version: << parameters.otp_version >>
           tag: << parameters.tag >>
           latest: << parameters.latest >>
-  buildx_and_push:
-    executor: amd64
-    parameters:
-      distro:
-        type: string
-      otp_version:
-        type: string
-      tag:
-        type: string
-        default: bionic-otp23
-      latest:
-        type: boolean
-        default: false
-    steps:
-      - checkout
-      - buildx_and_push:
-          dockerfile: Dockerfile-<< parameters.distro >>
-          otp_version: << parameters.otp_version >>
-          tag: << parameters.tag >>
-          latest: << parameters.latest >>
   docker_manifest:
     executor: amd64
     parameters:
@@ -212,7 +139,7 @@ workflows:
               ignore: master
 
       - docker_manifest:
-          name: "manifest_push_1804_otp23"
+          name: "build_manifest_bionic_otp23"
           manifest_list: >-
             ci-bionic-otp23-amd64-<< pipeline.git.branch >>
             ci-bionic-otp23-arm64-<< pipeline.git.branch >>
@@ -238,14 +165,54 @@ workflows:
 
   release:
     jobs:
-      - buildx_and_push:
-          name: "release_1804_otp23"
+      - build_and_push:
+          platform: amd64
+          name: "release_1804_otp23_amd64"
           distro: "bionic"
           otp_version: "23.3.4.5"
-          tag: "bionic-otp23"
-          latest: true
+          tag: "bionic-otp23-amd64"
           context: ae-dockerhub
           requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_and_push:
+          name: "release_1804_otp23_arm64"
+          platform: arm64
+          distro: "bionic"
+          otp_version: "23.3.4.5"
+          tag: "bionic-otp23-arm64"
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - docker_manifest:
+          name: "release_manifest_bionic_otp23"
+          manifest_list: >-
+            bionic-otp23-amd64
+            bionic-otp23-arm64
+          tag: bionic-otp23
+          context: ae-dockerhub
+          requires:
+            - release_1804_otp23_amd64
+            - release_1804_otp23_arm64
+          filters:
+            branches:
+              only: master
+
+      - docker_manifest:
+          name: "release_manifest_latest"
+          manifest_list: >-
+            bionic-otp23-amd64
+            bionic-otp23-arm64
+          tag: latest
+          context: ae-dockerhub
+          requires:
+            - release_1804_otp23_amd64
+            - release_1804_otp23_arm64
           filters:
             branches:
               only: master
