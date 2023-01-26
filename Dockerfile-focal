@@ -38,6 +38,7 @@ RUN PACKAGE_NAME=esl-erlang_${OTP_VERSION}-1~ubuntu~focal_$(dpkg --print-archite
     && dpkg -i ${PACKAGE_NAME} \
     && rm esl-erlang_${OTP_VERSION}-1~ubuntu~focal_$(dpkg --print-architecture).deb
 
+ENV PORTABLE=1
 ENV ROCKSDB_VERSION=6.13.3
 RUN set -xe \
     && ROCKSDB_DOWNLOAD_URL="https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz" \
