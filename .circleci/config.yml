@@ -4,6 +4,15 @@ parameters:
   docker_repo:
     type: string
     default: aeternity/builder
+  otp24:
+    type: string
+    default: "24.3.3.1"
+  otp25:
+    type: string
+    default: "25.3.2"
+  otp26:
+    type: string
+    default: "26.2.1"
 
 executors:
   amd64:
@@ -87,7 +96,6 @@ jobs:
         type: string
       tag:
         type: string
-        default: bionic-otp23
       latest:
         type: boolean
         default: false
@@ -115,11 +123,11 @@ workflows:
   commit:
     jobs:
       - build_and_push:
-          name: "build_2004_otp24_amd64"
+          name: "build_2004_otp26_amd64"
           platform: amd64
           distro: "focal"
-          otp_version: "24.3.3.1"
-          tag: ci-focal-otp24-amd64-<< pipeline.git.branch >>
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: ci-focal-otp26-amd64-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
           filters:
@@ -127,11 +135,11 @@ workflows:
               ignore: master
 
       - build_and_push:
-          name: "build_2004_otp24_arm64"
+          name: "build_2004_otp26_arm64"
           platform: arm64
           distro: "focal"
-          otp_version: "24.3.3.1"
-          tag: ci-focal-otp24-arm64-<< pipeline.git.branch >>
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: ci-focal-otp26-arm64-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
           filters:
@@ -139,15 +147,39 @@ workflows:
               ignore: master
 
       - docker_manifest:
-          name: "build_manifest_focal_otp24"
+          name: "build_manifest_focal_otp26"
           manifest_list: >-
-            ci-focal-otp24-amd64-<< pipeline.git.branch >>
-            ci-focal-otp24-arm64-<< pipeline.git.branch >>
-          tag: ci-focal-otp24-<< pipeline.git.branch >>
+            ci-focal-otp26-amd64-<< pipeline.git.branch >>
+            ci-focal-otp26-arm64-<< pipeline.git.branch >>
+          tag: ci-focal-otp26-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires:
-            - build_2004_otp24_amd64
-            - build_2004_otp24_arm64
+            - build_2004_otp26_amd64
+            - build_2004_otp26_arm64
+          filters:
+            branches:
+              ignore: master
+
+      - build_and_push:
+          name: "build_2004_otp25_amd64"
+          platform: amd64
+          distro: "focal"
+          otp_version: << pipeline.parameters.otp25 >>
+          tag: ci-focal-otp25-amd64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+
+      - build_and_push:
+          name: "build_2004_otp24_amd64"
+          platform: amd64
+          distro: "focal"
+          otp_version: << pipeline.parameters.otp24 >>
+          tag: ci-focal-otp24-amd64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
           filters:
             branches:
               ignore: master
@@ -156,10 +188,10 @@ workflows:
     jobs:
       - build_and_push:
           platform: amd64
-          name: "release_1804_otp23_amd64"
-          distro: "bionic"
-          otp_version: "23.3.4.5"
-          tag: "bionic-otp23-amd64"
+          name: "release_2004_otp26_amd64"
+          distro: "focal"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: "focal-otp26-amd64"
           context: ae-dockerhub
           requires: []
           filters:
@@ -167,11 +199,11 @@ workflows:
               only: master
 
       - build_and_push:
-          name: "release_1804_otp23_arm64"
+          name: "release_2004_otp26_arm64"
           platform: arm64
-          distro: "bionic"
-          otp_version: "23.3.4.5"
-          tag: "bionic-otp23-arm64"
+          distro: "focal"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: "focal-otp26-arm64"
           context: ae-dockerhub
           requires: []
           filters:
@@ -179,15 +211,15 @@ workflows:
               only: master
 
       - docker_manifest:
-          name: "release_manifest_bionic_otp23"
+          name: "release_manifest_bionic_otp26"
           manifest_list: >-
-            bionic-otp23-amd64
-            bionic-otp23-arm64
-          tag: bionic-otp23
+            focal-otp26-amd64
+            focal-otp26-arm64
+          tag: focal-otp26
           context: ae-dockerhub
           requires:
-            - release_1804_otp23_amd64
-            - release_1804_otp23_arm64
+            - release_2004_otp26_amd64
+            - release_2004_otp26_arm64
           filters:
             branches:
               only: master
@@ -195,33 +227,22 @@ workflows:
       - docker_manifest:
           name: "release_manifest_latest"
           manifest_list: >-
-            bionic-otp23-amd64
-            bionic-otp23-arm64
+            focal-otp26-amd64
+            focal-otp26-arm64
           tag: latest
           context: ae-dockerhub
           requires:
-            - release_1804_otp23_amd64
-            - release_1804_otp23_arm64
+            - release_2004_otp26_amd64
+            - release_2004_otp26_arm64
           filters:
             branches:
               only: master
 
       - build_and_push:
-          name: "release_1804_otp24"
-          distro: "bionic"
-          otp_version: "24.1.3"
-          tag: "bionic-otp24"
-          context: ae-dockerhub
-          requires: []
-          filters:
-            branches:
-              only: master
-
-      - build_and_push:
-          name: "release_2004_otp23"
+          name: "release_2004_otp25"
           distro: "focal"
-          otp_version: "23.3.4.5"
-          tag: "focal-otp23"
+          otp_version: << pipeline.parameters.otp25 >>
+          tag: "focal-otp25"
           context: ae-dockerhub
           requires: []
           filters:
@@ -231,7 +252,7 @@ workflows:
       - build_and_push:
           name: "release_2004_otp24"
           distro: "focal"
-          otp_version: "24.1.3"
+          otp_version: << pipeline.parameters.otp24 >>
           tag: "focal-otp24"
           context: ae-dockerhub
           requires: []
