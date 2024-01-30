@@ -6,7 +6,7 @@ parameters:
     default: aeternity/builder
   otp24:
     type: string
-    default: "24.3.3.1"
+    default: "24.3.4"
   otp25:
     type: string
     default: "25.3.2"
