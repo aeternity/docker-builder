@@ -115,11 +115,11 @@ workflows:
   commit:
     jobs:
       - build_and_push:
-          name: "build_1804_otp23_amd64"
+          name: "build_2004_otp24_amd64"
           platform: amd64
-          distro: "bionic"
-          otp_version: "23.3.4.5"
-          tag: ci-bionic-otp23-amd64-<< pipeline.git.branch >>
+          distro: "focal"
+          otp_version: "24.3.3.1"
+          tag: ci-focal-otp24-amd64-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
           filters:
@@ -127,11 +127,11 @@ workflows:
               ignore: master
 
       - build_and_push:
-          name: "build_1804_otp23_arm64"
+          name: "build_2004_otp24_arm64"
           platform: arm64
-          distro: "bionic"
-          otp_version: "23.3.4.5"
-          tag: ci-bionic-otp23-arm64-<< pipeline.git.branch >>
+          distro: "focal"
+          otp_version: "24.3.3.1"
+          tag: ci-focal-otp24-arm64-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires: []
           filters:
@@ -139,26 +139,15 @@ workflows:
               ignore: master
 
       - docker_manifest:
-          name: "build_manifest_bionic_otp23"
+          name: "build_manifest_focal_otp24"
           manifest_list: >-
-            ci-bionic-otp23-amd64-<< pipeline.git.branch >>
-            ci-bionic-otp23-arm64-<< pipeline.git.branch >>
-          tag: ci-bionic-otp23-<< pipeline.git.branch >>
+            ci-focal-otp24-amd64-<< pipeline.git.branch >>
+            ci-focal-otp24-arm64-<< pipeline.git.branch >>
+          tag: ci-focal-otp24-<< pipeline.git.branch >>
           context: ae-dockerhub
           requires:
-            - build_1804_otp23_amd64
-            - build_1804_otp23_arm64
-          filters:
-            branches:
-              ignore: master
-
-      - build_and_push:
-          name: "build_2004_otp23"
-          distro: "focal"
-          otp_version: "23.3.4.5"
-          tag: ci-focal-otp23-<< pipeline.git.branch >>
-          context: ae-dockerhub
-          requires: []
+            - build_2004_otp24_amd64
+            - build_2004_otp24_arm64
           filters:
             branches:
               ignore: master
