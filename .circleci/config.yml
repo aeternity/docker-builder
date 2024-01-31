@@ -211,7 +211,7 @@ workflows:
               only: master
 
       - docker_manifest:
-          name: "release_manifest_bionic_otp26"
+          name: "release_manifest_focal_otp26"
           manifest_list: >-
             focal-otp26-amd64
             focal-otp26-arm64
