@@ -1,0 +1,72 @@
+FROM ubuntu:22.04
+
+RUN apt-get -qq update \
+    && DEBIAN_FRONTEND=noninteractive apt-get -qq -y install \
+        apt-transport-https \
+        autoconf \
+        build-essential \
+        cmake \
+        curl \
+        jq \
+        debhelper \
+        default-jre-headless \
+        devscripts \
+        dh-autoreconf \
+        git \
+        libgmp-dev \
+        libsodium-dev \
+        libssl-dev \
+        ncurses-dev \
+        unzip \
+        libwxbase3.0-dev \
+        libwxgtk3.0-gtk3-dev \
+        libsctp1 \
+        libgflags-dev \
+        libsnappy-dev \
+        zlib1g-dev \
+        libbz2-dev \
+        liblz4-dev \
+        libzstd-dev \
+        libncurses5 \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG BUILD_OTP_VERSION="26.2.1"
+ENV OTP_VERSION=$BUILD_OTP_VERSION
+RUN OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.tar.gz" \
+    && curl -fsSL -o otp-src.tar.gz "$OTP_DOWNLOAD_URL" \
+    && mkdir otp-src \
+    && tar -zxf otp-src.tar.gz -C otp-src --strip-components=1 \
+    && cd otp-src \
+    && export ERL_TOP=`pwd` \
+    && ./otp_build autoconf && ./configure && make -j$(nproc) && make install
+
+ENV PORTABLE=1
+ENV ROCKSDB_VERSION=7.10.2
+RUN set -xe \
+    && ROCKSDB_DOWNLOAD_URL="https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz" \
+    && ROCKSDB_DOWNLOAD_SHA256="4619ae7308cd3d11cdd36f0bfad3fb03a1ad399ca333f192b77b6b95b08e2f78" \
+    && curl -fsSL -o rocksdb-src.tar.gz "$ROCKSDB_DOWNLOAD_URL" \
+    && echo "$ROCKSDB_DOWNLOAD_SHA256 rocksdb-src.tar.gz" | sha256sum -c - \
+    && mkdir rocksdb-src \
+    && tar -zxf rocksdb-src.tar.gz -C rocksdb-src --strip-components=1 \
+    && cd rocksdb-src \
+    && make shared_lib && make install-shared && ldconfig
+
+ENV REBAR3_VERSION="3.17.0"
+RUN set -xe \
+    && REBAR3_DOWNLOAD_URL="https://github.com/erlang/rebar3/archive/${REBAR3_VERSION}.tar.gz" \
+    && REBAR3_DOWNLOAD_SHA256="4c7f33a342bcab498f9bf53cc0ee5b698d9598b8fa9ef6a14bcdf44d21945c27" \
+    && mkdir -p /usr/src/rebar3-src \
+    && curl -fSL -o rebar3-src.tar.gz "$REBAR3_DOWNLOAD_URL" \
+    && echo "$REBAR3_DOWNLOAD_SHA256 rebar3-src.tar.gz" | sha256sum -c - \
+    && tar -xzf rebar3-src.tar.gz -C /usr/src/rebar3-src --strip-components=1 \
+    && rm rebar3-src.tar.gz \
+    && cd /usr/src/rebar3-src \
+    && HOME=$PWD ./bootstrap \
+    && install -v ./rebar3 /usr/local/bin/ \
+    && rm -rf /usr/src/rebar3-src
+
+# Add non-root user in case some app won't run as root
+RUN useradd --shell /bin/bash builder --create-home
+
+ENV SHELL=/bin/bash
