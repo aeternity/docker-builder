@@ -184,6 +184,68 @@ workflows:
             branches:
               ignore: master
 
+      - build_and_push:
+          name: "build_2204_otp26_amd64"
+          platform: amd64
+          distro: "jammy"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: ci-jammy-otp26-amd64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+
+      - build_and_push:
+          name: "build_2204_otp26_arm64"
+          platform: arm64
+          distro: "jammy"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: ci-jammy-otp26-arm64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+
+      - docker_manifest:
+          name: "build_manifest_jammy_otp26"
+          manifest_list: >-
+            ci-jammy-otp26-amd64-<< pipeline.git.branch >>
+            ci-jammy-otp26-arm64-<< pipeline.git.branch >>
+          tag: ci-jammy-otp26-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires:
+            - build_2204_otp26_amd64
+            - build_2204_otp26_arm64
+          filters:
+            branches:
+              ignore: master
+
+      - build_and_push:
+          name: "build_2204_otp25_amd64"
+          platform: amd64
+          distro: "jammy"
+          otp_version: << pipeline.parameters.otp25 >>
+          tag: ci-jammy-otp25-amd64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+
+      - build_and_push:
+          name: "build_2204_otp24_amd64"
+          platform: amd64
+          distro: "jammy"
+          otp_version: << pipeline.parameters.otp24 >>
+          tag: ci-jammy-otp24-amd64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+
   release:
     jobs:
       - build_and_push:
@@ -254,6 +316,80 @@ workflows:
           distro: "focal"
           otp_version: << pipeline.parameters.otp24 >>
           tag: "focal-otp24"
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_and_push:
+          platform: amd64
+          name: "release_2204_otp26_amd64"
+          distro: "jammy"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: "jammy-otp26-amd64"
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_and_push:
+          name: "release_2204_otp26_arm64"
+          platform: arm64
+          distro: "jammy"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: "jammy-otp26-arm64"
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - docker_manifest:
+          name: "release_manifest_bionic_otp26"
+          manifest_list: >-
+            jammy-otp26-amd64
+            jammy-otp26-arm64
+          tag: jammy-otp26
+          context: ae-dockerhub
+          requires:
+            - release_2204_otp26_amd64
+            - release_2204_otp26_arm64
+          filters:
+            branches:
+              only: master
+
+      - docker_manifest:
+          name: "release_manifest_latest"
+          manifest_list: >-
+            jammy-otp26-amd64
+            jammy-otp26-arm64
+          tag: latest
+          context: ae-dockerhub
+          requires:
+            - release_2204_otp26_amd64
+            - release_2204_otp26_arm64
+          filters:
+            branches:
+              only: master
+
+      - build_and_push:
+          name: "release_2204_otp25"
+          distro: "jammy"
+          otp_version: << pipeline.parameters.otp25 >>
+          tag: "jammy-otp25"
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_and_push:
+          name: "release_2204_otp24"
+          distro: "jammy"
+          otp_version: << pipeline.parameters.otp24 >>
+          tag: "jammy-otp24"
           context: ae-dockerhub
           requires: []
           filters:
