@@ -18,8 +18,7 @@ RUN apt-get -qq update \
         libssl-dev \
         ncurses-dev \
         unzip \
-        libwxbase3.0-dev \
-        libwxgtk3.0-gtk3-dev \
+        libwxgtk3.2-dev \
         libsctp1 \
         libgflags-dev \
         libsnappy-dev \
@@ -27,7 +26,6 @@ RUN apt-get -qq update \
         libbz2-dev \
         liblz4-dev \
         libzstd-dev \
-        libncurses5 \
     && rm -rf /var/lib/apt/lists/*
 
 ARG BUILD_OTP_VERSION="26.2.1"
