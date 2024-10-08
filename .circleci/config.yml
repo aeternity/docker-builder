@@ -246,6 +246,44 @@ workflows:
             branches:
               ignore: master
 
+      - build_and_push:
+          name: "build_2404_otp26_amd64"
+          platform: amd64
+          distro: "noble"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: ci-noble-otp26-amd64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+
+      - build_and_push:
+          name: "build_2404_otp26_arm64"
+          platform: arm64
+          distro: "noble"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: ci-noble-otp26-arm64-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              ignore: master
+
+      - docker_manifest:
+          name: "build_manifest_noble_otp26"
+          manifest_list: >-
+            ci-noble-otp26-amd64-<< pipeline.git.branch >>
+            ci-noble-otp26-arm64-<< pipeline.git.branch >>
+          tag: ci-noble-otp26-<< pipeline.git.branch >>
+          context: ae-dockerhub
+          requires:
+            - build_2404_otp26_amd64
+            - build_2404_otp26_arm64
+          filters:
+            branches:
+              ignore: master
+
   release:
     jobs:
       - build_and_push:
@@ -273,7 +311,7 @@ workflows:
               only: master
 
       - docker_manifest:
-          name: "release_manifest_bionic_otp26"
+          name: "release_manifest_focal_otp26"
           manifest_list: >-
             focal-otp26-amd64
             focal-otp26-arm64
@@ -347,7 +385,7 @@ workflows:
               only: master
 
       - docker_manifest:
-          name: "release_manifest_bionic_otp26"
+          name: "release_manifest_jammy_otp26"
           manifest_list: >-
             jammy-otp26-amd64
             jammy-otp26-arm64
@@ -392,6 +430,58 @@ workflows:
           tag: "jammy-otp24"
           context: ae-dockerhub
           requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_and_push:
+          platform: amd64
+          name: "release_2404_otp26_amd64"
+          distro: "noble"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: "noble-otp26-amd64"
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - build_and_push:
+          name: "release_2404_otp26_arm64"
+          platform: arm64
+          distro: "noble"
+          otp_version: << pipeline.parameters.otp26 >>
+          tag: "noble-otp26-arm64"
+          context: ae-dockerhub
+          requires: []
+          filters:
+            branches:
+              only: master
+
+      - docker_manifest:
+          name: "release_manifest_noble_otp26"
+          manifest_list: >-
+            noble-otp26-amd64
+            noble-otp26-arm64
+          tag: noble-otp26
+          context: ae-dockerhub
+          requires:
+            - release_2404_otp26_amd64
+            - release_2404_otp26_arm64
+          filters:
+            branches:
+              only: master
+
+      - docker_manifest:
+          name: "release_manifest_latest"
+          manifest_list: >-
+            noble-otp26-amd64
+            noble-otp26-arm64
+          tag: latest
+          context: ae-dockerhub
+          requires:
+            - release_2404_otp26_amd64
+            - release_2404_otp26_arm64
           filters:
             branches:
               only: master
