@@ -41,10 +41,10 @@ RUN OTP_DOWNLOAD_URL="https://github.com/erlang/otp/archive/OTP-${OTP_VERSION}.t
     && ./otp_build autoconf && ./configure && make -j$(nproc) && make install
 
 ENV PORTABLE=1
-ENV ROCKSDB_VERSION=7.10.2
+ENV ROCKSDB_VERSION=8.11.4
 RUN set -xe \
     && ROCKSDB_DOWNLOAD_URL="https://github.com/facebook/rocksdb/archive/v${ROCKSDB_VERSION}.tar.gz" \
-    && ROCKSDB_DOWNLOAD_SHA256="4619ae7308cd3d11cdd36f0bfad3fb03a1ad399ca333f192b77b6b95b08e2f78" \
+    && ROCKSDB_DOWNLOAD_SHA256="1b84c7d7214360fd536349917c57ebd5030d5b4fc214a343ba628b0c6e3d2711" \
     && curl -fsSL -o rocksdb-src.tar.gz "$ROCKSDB_DOWNLOAD_URL" \
     && echo "$ROCKSDB_DOWNLOAD_SHA256 rocksdb-src.tar.gz" | sha256sum -c - \
     && mkdir rocksdb-src \
